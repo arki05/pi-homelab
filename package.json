@@ -1,0 +1,17 @@
+{
+	"name": "pi-homelab",
+	"version": "0.1.0",
+	"description": "Homelab llama-swap pi extension (OpenAI-compatible provider with auto-discovery)",
+	"type": "module",
+	"license": "MIT",
+	"keywords": ["pi-package", "pi-extension", "homelab", "llama-swap"],
+	"pi": {
+		"extensions": ["./index.ts"]
+	},
+	"peerDependencies": {
+		"@earendil-works/pi-coding-agent": "*"
+	},
+	"peerDependenciesMeta": {
+		"@earendil-works/pi-coding-agent": { "optional": true }
+	}
+}
