@@ -7,7 +7,7 @@ Homelab `llama-swap` pi extension. Auto-discovers models from a running
 [pi](https://pi.dev).
 
 ```bash
-pi install git:github.com/<you>/pi-homelab
+pi install git:github.com/arki05/pi-homelab
 ```
 
 ## Setup
@@ -23,7 +23,7 @@ export HOMELAB_BASE_URL="http://<your-box>:8080/v1"
 **From the shell:**
 
 ```bash
-pi install git:github.com/<you>/pi-homelab
+pi install git:github.com/arki05/pi-homelab
 ```
 
 This clones the repo and adds an entry to your pi settings. Every future `pi`
@@ -32,7 +32,7 @@ invocation auto-loads it.
 **From inside an interactive pi session:**
 
 ```
-!pi install git:github.com/<you>/pi-homelab
+!pi install git:github.com/arki05/pi-homelab
 ```
 
 Then run `/reload` (or restart pi) to load the extension.
@@ -40,7 +40,7 @@ Then run `/reload` (or restart pi) to load the extension.
 **Dev mode:**
 
 ```bash
-git clone https://github.com/<you>/pi-homelab ~/code/pi-homelab
+git clone https://github.com/arki05/pi-homelab ~/code/pi-homelab
 pi -e ~/code/pi-homelab/index.ts
 ```
 
