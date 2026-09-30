@@ -6,22 +6,24 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 // Override with HOMELAB_BASE_URL when the box lives at another address.
 const BASE_URL = process.env.HOMELAB_BASE_URL ?? "http://192.168.181.50:8080/v1";
 
-// llama-swap advertises every alias as its own id. The -xhigh/-medium/-low/
-// -nothink ids are the same weights with different chat_template_kwargs, and
-// pi can send those itself (see thinkingLevelMap below), so only the base id
-// is registered and the thinking level is chosen with `--model …:<level>`.
-const ALIASES = /-(xhigh|medium|low|nothink)$/;
+// llama-swap marks ..-xhigh/-medium/-low/-nothink ids as what they are:
+// { meta: { llamaswap: { type: "alias", modelID: "<base>" } } }. Aliases are
+// the same weights with different chat_template_kwargs, and pi sends those
+// itself (see thinkingLevelMap below), so only the base id is registered
+// and the thinking level is chosen with `--model …:<level>`.
+type Served = { id: string; meta?: { llamaswap?: { type?: string } } };
 
-// Image models on the same box (krea, qwen-image, …) aren't chat LLMs —
-// skip them so they never become pi's default or clutter the picker.
-// Extra patterns via HOMELAB_EXCLUDE="foo|bar" (regex, case-insensitive).
+// Image models on the same box aren't chat LLMs — skip them so they never
+// become pi's default or clutter the picker. Matched narrowly on purpose:
+// a broad "image" would catch future multimodal chat models too.
+// Anything new goes via HOMELAB_EXCLUDE="foo|bar" (regex, case-insensitive).
 const SKIP = new RegExp(
-  ["image", "krea", process.env.HOMELAB_EXCLUDE].filter(Boolean).join("|"),
+  ["qwen-image", "krea", process.env.HOMELAB_EXCLUDE].filter(Boolean).join("|"),
   "i",
 );
 
 export default async function (pi: ExtensionAPI) {
-  let served: Array<{ id: string }>;
+  let served: Served[];
 
   try {
     const response = await fetch(`${BASE_URL}/models`, {
@@ -35,7 +37,7 @@ export default async function (pi: ExtensionAPI) {
   }
 
   const models = served
-    .filter((model) => !ALIASES.test(model.id) && !SKIP.test(model.id))
+    .filter((model) => model.meta?.llamaswap?.type !== "alias" && !SKIP.test(model.id))
     // pi picks the first model of a provider before consulting the saved
     // default (see model-resolver: "First model from scoped models"), and
     // /v1/models is alphabetical, which would start sessions on the small CPU
