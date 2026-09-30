@@ -12,6 +12,14 @@ const BASE_URL = process.env.HOMELAB_BASE_URL ?? "http://192.168.181.50:8080/v1"
 // is registered and the thinking level is chosen with `--model …:<level>`.
 const ALIASES = /-(xhigh|medium|low|nothink)$/;
 
+// Image models on the same box (krea, qwen-image, …) aren't chat LLMs —
+// skip them so they never become pi's default or clutter the picker.
+// Extra patterns via HOMELAB_EXCLUDE="foo|bar" (regex, case-insensitive).
+const SKIP = new RegExp(
+  ["image", "krea", process.env.HOMELAB_EXCLUDE].filter(Boolean).join("|"),
+  "i",
+);
+
 export default async function (pi: ExtensionAPI) {
   let served: Array<{ id: string }>;
 
@@ -27,7 +35,7 @@ export default async function (pi: ExtensionAPI) {
   }
 
   const models = served
-    .filter((model) => !ALIASES.test(model.id))
+    .filter((model) => !ALIASES.test(model.id) && !SKIP.test(model.id))
     // pi picks the first model of a provider before consulting the saved
     // default (see model-resolver: "First model from scoped models"), and
     // /v1/models is alphabetical, which would start sessions on the small CPU
